@@ -46,11 +46,12 @@ export const useCartStore = create((set, get) => ({
 	clearCart: async () => {
 		set({ cart: [], coupon: null, total: 0, subtotal: 0 });
 	},
-	addToCart: async (product) => {
+    addToCart: async (product) => {
 		try {
-			await axios.post("/cart", { productId: product._id });
+			// Include phone number when sending the request
+			await axios.post("/cart", { productId: product._id});
 			toast.success("Product added to cart");
-
+	
 			set((prevState) => {
 				const existingItem = prevState.cart.find((item) => item._id === product._id);
 				const newCart = existingItem
@@ -62,7 +63,7 @@ export const useCartStore = create((set, get) => ({
 			});
 			get().calculateTotals();
 		} catch (error) {
-			toast.error(error.response.data.message || "An error occurred");
+			toast.error(error.response?.data?.message || "An error occurred");
 		}
 	},
 	removeFromCart: async (productId) => {

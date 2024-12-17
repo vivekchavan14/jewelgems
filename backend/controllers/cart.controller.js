@@ -1,4 +1,5 @@
 import Product from "../models/product.model.js";
+import User from "../models/user.model.js";
 
 export const getCartProducts = async (req, res) => {
 	try {
@@ -20,22 +21,42 @@ export const getCartProducts = async (req, res) => {
 export const addToCart = async (req, res) => {
 	try {
 		const { productId } = req.body;
+		if (!productId) {
+			return res.status(400).json({ message: "Product ID is required" });
+		}
+
 		const user = req.user;
 
-		const existingItem = user.cartItems.find((item) => item.id === productId);
+		// Initialize cartItems if undefined
+		if (!user.cartItems) {
+			user.cartItems = [];
+		}
+
+		// Check if the product already exists in the cart
+		const existingItem = user.cartItems.find(
+			(item) => item.product?.toString() === productId
+		);
+
 		if (existingItem) {
 			existingItem.quantity += 1;
 		} else {
-			user.cartItems.push(productId);
+			user.cartItems.push({ product: productId, quantity: 1 });
 		}
 
-		await user.save();
+		// Update only the cartItems field
+		await User.updateOne(
+			{ _id: user._id },
+			{ cartItems: user.cartItems }
+		);
+
+		// Return updated cart
 		res.json(user.cartItems);
 	} catch (error) {
-		console.log("Error in addToCart controller", error.message);
+		console.error("Error in addToCart controller:", error.message);
 		res.status(500).json({ message: "Server error", error: error.message });
 	}
 };
+
 
 export const removeAllFromCart = async (req, res) => {
 	try {
