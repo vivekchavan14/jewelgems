@@ -4,6 +4,7 @@ import { useUserStore } from "../stores/useUserStore";
 import { useCartStore } from "../stores/useCartStore";
 import logo from "./../assets/logo.svg"; // Add the logo file here
 
+
 const Navbar = () => {
   const { user, logout } = useUserStore();
   const isAdmin = user?.role === "admin";
@@ -28,6 +29,13 @@ const Navbar = () => {
           className="text-black hover:text-pink-500 transition duration-300 ease-in-out text-lg font-medium"
         >
           Home
+        </Link>
+
+        <Link
+          to="/collections"
+          className="text-black hover:text-pink-500 transition duration-300 ease-in-out text-lg font-medium"
+        >
+          Collections
         </Link>
 
         {user && (

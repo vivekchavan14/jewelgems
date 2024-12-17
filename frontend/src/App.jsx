@@ -17,6 +17,8 @@ import PurchaseSuccessPage from "./pages/PurchaseSuccessPage";
 import PurchaseCancelPage from "./pages/PurchaseCancelPage";
 import Footer from "./components/Footer";
 
+
+
 function App() {
 	const { user, checkAuth, checkingAuth } = useUserStore();
 	const { getCartItems } = useCartStore();
