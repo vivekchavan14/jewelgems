@@ -1,87 +1,82 @@
 import { motion } from "framer-motion";
 import { useCartStore } from "../stores/useCartStore";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { MoveRight } from "lucide-react";
 import axios from "../lib/axios";
 import { useEffect, useState } from "react";
 import { cashfree } from "../utils/util";
 
 const OrderSummary = () => {
-  const { total, subtotal, coupon, isCouponApplied, cart } = useCartStore();
+  const { total, subtotal, coupon, isCouponApplied } = useCartStore();
 
   const savings = subtotal - total;
   const formattedSubtotal = subtotal.toFixed(2);
   const formattedTotal = total.toFixed(2);
   const formattedSavings = savings.toFixed(2);
 
-  const params = useParams();
-  const isSessionId = params.sessionid;
-
   const [loading, setLoading] = useState(false);
   const [sessionId, setSessionId] = useState(null);
-  const version = cashfree.version();
 
-  const getSessionId = async () => {
+  // Function to fetch payment session ID
+  const fetchSessionId = async () => {
     try {
-      setLoading(true);
-      const res = await axios.post("api/cashfree/payment", { version });
+      const res = await axios.post("/api/cashfree/payment", {
+        version: cashfree.version(),
+      });
       if (res.data && res.data.paymentSessionId) {
-        setSessionId(res.data.paymentSessionId);
-      } else {
-        alert("Session ID could not be retrieved.");
+        return res.data.paymentSessionId;
       }
+      throw new Error("Failed to retrieve payment session ID.");
     } catch (error) {
       console.error("Error fetching session ID:", error);
-      alert("Failed to fetch session ID. Please try again.");
-    } finally {
-      setLoading(false);
+      alert("Failed to initiate payment. Please try again.");
+      return null;
     }
   };
 
-  useEffect(() => {
-    if (!sessionId) {
-      getSessionId();
-    }
-  }, [sessionId]);
-
+  // Payment Handler
   const handlePayment = async () => {
     try {
-      if (!sessionId) {
-        setLoading(true);
-        const res = await axios.post("/api/cashfree/payment", { version });
-        setSessionId(res.data.paymentSessionId);
-      }
+      setLoading(true);
 
+      // Fetch session ID if not already available
       const currentSessionId = sessionId || (await fetchSessionId());
+      if (!currentSessionId) return;
 
-      if (!currentSessionId) {
-        alert("Failed to retrieve payment session ID. Please try again.");
-        return;
-      }
+      // Store session ID
+      setSessionId(currentSessionId);
 
+      // Initiate Cashfree Checkout
       const checkoutOptions = {
         paymentSessionId: currentSessionId,
-        returnUrl: "http://localhost:8000/api/cashfree/status/{orderid}",
+        returnUrl: "http://localhost:8000/api/cashfree/status/{orderid}", // Replace orderid dynamically if needed
       };
 
       cashfree
         .checkout(checkoutOptions)
         .then((result) => {
           if (result.error) {
+            console.error("Payment Error:", result.error.message);
             alert(result.error.message);
-          } else if (result.redirect) {
-            console.log("Redirection triggered:", result);
           }
         })
         .catch((error) => {
           console.error("Cashfree Checkout Error:", error);
+          alert("Payment failed. Please try again.");
         });
     } catch (error) {
-      console.error("Error during payment handling:", error);
+      console.error("Error during payment process:", error);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    // Automatically fetch session ID when the component mounts
+    if (!sessionId) {
+      fetchSessionId().then((id) => setSessionId(id));
+    }
+  }, [sessionId]);
 
   return (
     <motion.div

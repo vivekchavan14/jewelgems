@@ -1,9 +1,9 @@
 import express from 'express';
 
-import { newOrderId, checkStatus } from '../controllers/cashfree.controller.js';
+import { createPaymentSession, checkPaymentStatus} from '../controllers/cashfree.controller.js';
 const router = express.Router();
 
-router.post('/payment', newOrderId);
-router.get('/status/:orderid', checkStatus);
+router.post('/payment', createPaymentSession);
+router.get('/status/:orderid', checkPaymentStatus);
 
 export default router;
