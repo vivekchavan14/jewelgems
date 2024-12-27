@@ -3,7 +3,8 @@ import { motion } from "framer-motion";
 import { PlusCircle, Upload, Loader } from "lucide-react";
 import { useProductStore } from "../stores/useProductStore";
 
-const categories = ["Daimond", "silver", "gemstones", "rudraksha"];
+const categories = ["Diamond", "Silver", "Gemstones", "Rudraksha"];
+const subCategories = ["Anklets", "Bracelets", "Earrings", "Mens Jewellery", "Necklace"];
 
 const CreateProductForm = () => {
 	const [newProduct, setNewProduct] = useState({
@@ -11,8 +12,11 @@ const CreateProductForm = () => {
 		description: "",
 		price: "",
 		category: "",
+		subCategory: "",
 		image: "",
 	});
+	const [error, setError] = useState("");
+	const [success, setSuccess] = useState("");
 
 	const { createProduct, loading } = useProductStore();
 
@@ -20,9 +24,20 @@ const CreateProductForm = () => {
 		e.preventDefault();
 		try {
 			await createProduct(newProduct);
-			setNewProduct({ name: "", description: "", price: "", category: "", image: "" });
-		} catch {
-			console.log("error creating a product");
+			setNewProduct({
+				name: "",
+				description: "",
+				price: "",
+				category: "",
+				subCategory: "",
+				image: "",
+			});
+			setError("");
+			setSuccess("Product created successfully!");
+		} catch (err) {
+			console.error("Error creating product:", err);
+			setError("Failed to create product. Please try again.");
+			setSuccess("");
 		}
 	};
 
@@ -30,12 +45,10 @@ const CreateProductForm = () => {
 		const file = e.target.files[0];
 		if (file) {
 			const reader = new FileReader();
-
 			reader.onloadend = () => {
 				setNewProduct({ ...newProduct, image: reader.result });
 			};
-
-			reader.readAsDataURL(file); // base64
+			reader.readAsDataURL(file); // Convert to base64
 		}
 	};
 
@@ -49,6 +62,9 @@ const CreateProductForm = () => {
 			<h2 className="text-2xl font-semibold mb-6 text-pink-300">Create New Product</h2>
 
 			<form onSubmit={handleSubmit} className="space-y-4">
+				{error && <p className="text-sm text-red-500">{error}</p>}
+				{success && <p className="text-sm text-green-500">{success}</p>}
+
 				<div>
 					<label htmlFor="name" className="block text-sm font-medium text-gray-300">
 						Product Name
@@ -88,7 +104,12 @@ const CreateProductForm = () => {
 						id="price"
 						name="price"
 						value={newProduct.price}
-						onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
+						onChange={(e) => {
+							const value = parseFloat(e.target.value);
+							if (value > 0 || e.target.value === "") {
+								setNewProduct({ ...newProduct, price: e.target.value });
+							}
+						}}
 						step="0.01"
 						className="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
 						required
@@ -116,6 +137,27 @@ const CreateProductForm = () => {
 					</select>
 				</div>
 
+				<div>
+					<label htmlFor="subCategory" className="block text-sm font-medium text-gray-300">
+						Sub Category
+					</label>
+					<select
+						id="subCategory"
+						name="subCategory"
+						value={newProduct.subCategory}
+						onChange={(e) => setNewProduct({ ...newProduct, subCategory: e.target.value })}
+						className="mt-1 block w-full bg-gray-700 border border-gray-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500"
+						required
+					>
+						<option value="">Select a sub category</option>
+						{subCategories.map((subCategory) => (
+							<option key={subCategory} value={subCategory}>
+								{subCategory}
+							</option>
+						))}
+					</select>
+				</div>
+
 				<div className="mt-1 flex items-center">
 					<input type="file" id="image" className="sr-only" accept="image/*" onChange={handleImageChange} />
 					<label
@@ -125,8 +167,14 @@ const CreateProductForm = () => {
 						<Upload className="h-5 w-5 inline-block mr-2" />
 						Upload Image
 					</label>
-					{newProduct.image && <span className="ml-3 text-sm text-gray-400">Image uploaded </span>}
+					{newProduct.image && <span className="ml-3 text-sm text-gray-400">Image uploaded</span>}
 				</div>
+
+				{newProduct.image && (
+					<div className="mt-3">
+						<img src={newProduct.image} alt="Preview" className="w-32 h-32 object-cover rounded-md" />
+					</div>
+				)}
 
 				<button
 					type="submit"

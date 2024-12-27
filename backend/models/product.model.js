@@ -31,6 +31,10 @@ const productSchema = new mongoose.Schema(
 			type: String,
 			required: true,
 		},
+		subCategory: {
+			type: String,
+			required: true,
+		},
 		isFeatured: {
 			type: Boolean,
 			default: false,

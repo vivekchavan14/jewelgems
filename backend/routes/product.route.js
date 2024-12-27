@@ -2,6 +2,7 @@ import express from "express";
 import {
 	createProduct,
 	deleteProduct,
+	fetchProductByID,
 	getAllProducts,
 	getFeaturedProducts,
 	getProductsByCategory,
@@ -12,6 +13,8 @@ import { adminRoute, protectRoute } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
+router.get("/products", protectRoute, getAllProducts);
+router.get("/products/:id", protectRoute, fetchProductByID);
 router.get("/", protectRoute, adminRoute, getAllProducts);
 router.get("/featured", getFeaturedProducts);
 router.get("/category/:category", getProductsByCategory);
