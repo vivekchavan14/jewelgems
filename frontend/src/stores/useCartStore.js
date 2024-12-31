@@ -32,15 +32,20 @@ export const useCartStore = create((set, get) => ({
 		get().calculateTotals();
 		toast.success("Coupon removed");
 	},
-
-	getCartItems: async () => {
+    getCartItems: async () => {
 		try {
 			const res = await axios.get("/cart");
-			set({ cart: res.data });
-			get().calculateTotals();
+			if (res.data && Array.isArray(res.data)) {
+				set({ cart: res.data });
+				get().calculateTotals();
+			} else {
+				throw new Error("Unexpected response format");
+			}
 		} catch (error) {
 			set({ cart: [] });
-			toast.error(error.response.data.message || "An error occurred");
+			const errorMessage = error.response?.data?.message || "An error occurred";
+			toast.error(errorMessage);
+			console.error("Error in getCartItems:", errorMessage);
 		}
 	},
 	clearCart: async () => {
