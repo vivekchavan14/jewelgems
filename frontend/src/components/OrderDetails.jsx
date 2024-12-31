@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 
@@ -10,7 +10,7 @@ const OrderDetails = ({ userId }) => {
   useEffect(() => {
     const fetchUserWithCart = async () => {
       try {
-        const response = await axios.get(`/api/cart/orders/${userId}`);
+        const response = await axios.get(`/cart/orders/${userId}`);
         setUser(response.data);
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch user cart");
