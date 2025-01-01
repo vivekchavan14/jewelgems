@@ -1,7 +1,5 @@
 import { motion } from "framer-motion";
 import { useCartStore } from "../stores/useCartStore";
-import { Link } from "react-router-dom";
-import { MoveRight } from "lucide-react";
 import axios from "../lib/axios";
 import { useState } from "react";
 
@@ -9,7 +7,7 @@ import { useState } from "react";
 import { cashfree } from "../utils/util"; // You can define this utility to call the Cashfree API
 
 const OrderSummary = () => {
-  const { total, subtotal, coupon, isCouponApplied, user } = useCartStore();  // Assuming 'user' object has user info
+  const { total, subtotal, isCouponApplied, user } = useCartStore();  // Assuming 'user' object has user info
   const savings = subtotal - total;
 
   const [loading, setLoading] = useState(false);
