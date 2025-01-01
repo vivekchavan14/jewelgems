@@ -32,7 +32,7 @@ export const useCartStore = create((set, get) => ({
 		get().calculateTotals();
 		toast.success("Coupon removed");
 	},
-    getCartItems: async () => {
+	getCartItems: async () => {
 		try {
 			const res = await axios.get("/cart");
 			if (res.data && Array.isArray(res.data)) {
