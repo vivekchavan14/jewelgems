@@ -23,7 +23,7 @@ export const createPaymentSession = async (req, res) => {
 
     // Prepare the return URL dynamically
     const returnUrl = process.env.NODE_ENV === 'production' 
-      ? `https://your-production-url.com/api/cashfree/status/${orderId}` // For production
+      ? `https://jewelgems.in/api/cashfree/status/${orderId}` // For production
       : `http://localhost:8000/api/cashfree/status/${orderId}`;  // For development
 
     const options = {
@@ -106,11 +106,11 @@ export const checkPaymentStatus = async (req, res) => {
 
     // Dynamically redirect based on order status
     if (order_status === 'PAID') {
-      return res.redirect(`http://localhost:8000/success?orderId=${orderid}`);
+      return res.redirect(`http://82.112.231.201:5000/success?orderId=${orderid}`);
     } else if (order_status === 'ACTIVE') {
-      return res.redirect(`http://localhost:8000/active?orderId=${orderid}`);
+      return res.redirect(`http://82.112.231.201:5000/active?orderId=${orderid}`);
     } else if (order_status === 'FAILED' || order_status === 'CANCELLED') {
-      return res.redirect(`http://localhost:8000/failure?orderId=${orderid}`);
+      return res.redirect(`http://82.112.231.201:5000/failure?orderId=${orderid}`);
     } else {
       return res.status(400).json({
         message: `Unhandled order status: ${order_status}`,
