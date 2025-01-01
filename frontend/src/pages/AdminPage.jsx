@@ -1,5 +1,5 @@
 import { BarChart, Package, PlusCircle, ShoppingBasket } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 
 import AnalyticsTab from "../components/AnalyticsTab";
@@ -7,16 +7,21 @@ import CreateProductForm from "../components/CreateProductForm";
 import ProductsList from "../components/ProductsList";
 import { useProductStore } from "../stores/useProductStore";
 import OrderDetails from "../components/OrderDetails";
-const tabs = [
-  { id: "create", label: "Create Product", icon: PlusCircle },
-  { id: "products", label: "Products", icon: ShoppingBasket },
-  { id: "analytics", label: "Analytics", icon: BarChart },
-  { id: "orders", label: "Orders", icon: Package }, // Assuming "Package" is an icon for orders
-];
 
 const AdminPage = () => {
   const [activeTab, setActiveTab] = useState("create");
   const { fetchAllProducts } = useProductStore();
+
+  // UseMemo to prevent re-renders for tabs
+  const tabs = useMemo(
+    () => [
+      { id: "create", label: "Create Product", icon: <PlusCircle /> },
+      { id: "products", label: "Products", icon: <ShoppingBasket /> },
+      { id: "analytics", label: "Analytics", icon: <BarChart /> },
+      { id: "orders", label: "Orders", icon: <Package /> },
+    ],
+    []
+  );
 
   useEffect(() => {
     fetchAllProducts();
@@ -45,17 +50,20 @@ const AdminPage = () => {
                   : "bg-gray-700 text-gray-300 hover:bg-gray-600"
               }`}
             >
-              <tab.icon className='mr-2 h-5 w-5' />
+              <div className='mr-2 h-5 w-5'>{tab.icon}</div> {/* Rendering icon here */}
               {tab.label}
             </button>
           ))}
         </div>
+
+        {/* Conditional rendering based on active tab */}
         {activeTab === "create" && <CreateProductForm />}
         {activeTab === "products" && <ProductsList />}
         {activeTab === "analytics" && <AnalyticsTab />}
-        {activeTab === "orders" && <OrderDetails/>}
+        {activeTab === "orders" && <OrderDetails />}
       </div>
     </div>
   );
 };
+
 export default AdminPage;
