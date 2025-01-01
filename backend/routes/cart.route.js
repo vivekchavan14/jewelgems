@@ -9,6 +9,5 @@ router.get("/", protectRoute, getCartProducts);
 router.post("/", protectRoute, addToCart);
 router.delete("/", protectRoute, removeAllFromCart);
 router.put("/:id", protectRoute, updateQuantity);
-router.get("/orders/:userId",protectRoute,adminRoute,getUserWithCart)
 
 export default router;
